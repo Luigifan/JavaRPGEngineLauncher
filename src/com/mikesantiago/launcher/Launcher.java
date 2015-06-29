@@ -1,5 +1,6 @@
 package com.mikesantiago.launcher;
 
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.Toolkit;
@@ -8,6 +9,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Scanner;
 
@@ -21,6 +23,10 @@ import javax.swing.JPanel;
 import com.mikesantiago.launcher.OSDetection.OSType;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
+import javax.swing.event.HyperlinkEvent;
+import javax.swing.event.HyperlinkListener;
 
 public class Launcher extends JFrame 
 {
@@ -41,27 +47,13 @@ public class Launcher extends JFrame
 		Dimension dim = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(dim.width/2-this.getSize().width/2, dim.height/2-this.getSize().height/2);
 		
-		JEditorPane editorPane = new JEditorPane();
-		editorPane.setEditable(false);
-		editorPane.setBounds(0, 0, 640, 288);
-		try 
-		{
-			editorPane.setPage("http://mrmiketheripper.x10.mx/rpg/update");
-		}
-		catch (IOException e) 
-		{
-				editorPane.setContentType("text/html");
-				editorPane.setText("<html>Could not load</html>");
-		} 
-		getContentPane().add(editorPane);
-		
 		JPanel panel = new JPanel();
-		panel.setBounds(0, 289, 640, 81);
+		panel.setBounds(0, 287, 640, 81);
 		getContentPane().add(panel);
 		panel.setLayout(null);
 		
 		curVerLabel = new JLabel("CurVer");
-		curVerLabel.setBounds(314, 11, 163, 16);
+		curVerLabel.setBounds(6, 14, 232, 16);
 		panel.add(curVerLabel);
 		
 		JButton btnLaunch = new JButton("Launch");
@@ -71,12 +63,47 @@ public class Launcher extends JFrame
 				RunGame();
 			}
 		});
-		btnLaunch.setBounds(459, 21, 163, 29);
+		btnLaunch.setBounds(231, 29, 163, 29);
 		panel.add(btnLaunch);
 		
 		latestVerLabel = new JLabel("LatestVer");
-		latestVerLabel.setBounds(314, 47, 163, 16);
+		latestVerLabel.setBounds(6, 42, 232, 16);
 		panel.add(latestVerLabel);
+		
+		
+		JEditorPane editorPane = new JEditorPane();
+		editorPane.setContentType("text/html");
+		editorPane.setEditable(false);
+		editorPane.setBounds(0, 0, 640, 288);
+		try 
+		{
+			editorPane.setPage("http://mrmiketheripper.x10.mx/rpg/update");
+		} 
+		catch (IOException e1) 
+		{
+			editorPane.setText("<html>Couldn't load page</html>");
+			editorPane.setContentType("text/html");
+		}
+		editorPane.addHyperlinkListener(new HyperlinkListener() {
+		    public void hyperlinkUpdate(HyperlinkEvent e) {
+		        if(e.getEventType() == HyperlinkEvent.EventType.ACTIVATED) {
+		        	if(Desktop.isDesktopSupported()) {
+		        	    try {
+							Desktop.getDesktop().browse(e.getURL().toURI());
+						} catch (IOException e1) {
+							e1.printStackTrace();
+						} catch (URISyntaxException e1) {
+							e1.printStackTrace();
+						}
+		        	}
+		        }
+		    }
+		});
+		
+		JScrollPane scrollPane = new JScrollPane(editorPane);
+		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		scrollPane.setBounds(0, 0, 640, 289);
+		getContentPane().add(scrollPane);
 		
 		SetIcons();
 		UpdateCurrentInternalVersion();
@@ -101,8 +128,24 @@ public class Launcher extends JFrame
 			else
 				dataFolder = new File(System.getProperty("user.home") + "/.JavaRPGEngine/bin/jrpg.jar");
 			this.setVisible(false);
-			Process p = Runtime.getRuntime()
-					.exec(new String[] { "java", "-jar", dataFolder.getAbsolutePath() });
+			
+			Process p = null;
+			
+			if(MainProgram.CurrentOS == OSType.macosx)
+			{
+				p = Runtime.getRuntime()
+						.exec(new String[] { "java", "-Dapple.laf.useScreenMenuBar=true", 
+								"-Dcom.apple.macos.use-file-dialog-packages=true", 
+								"-Xdock:name=Java RPG Engine", 
+								"-jar",
+								dataFolder.getAbsolutePath() });
+			}
+			else
+			{
+				p = Runtime.getRuntime()
+						.exec(new String[] { "java", "-jar", dataFolder.getAbsolutePath() });
+			}
+			
 			p.waitFor();
 			java.io.InputStream is = p.getInputStream();
 			byte b[] = new byte[is.available()];
@@ -113,6 +156,7 @@ public class Launcher extends JFrame
 			es.read(b, 0, b.length);
 			System.out.println(new String(b));
 			this.setVisible(true);
+			this.requestFocus();
 		} catch (Exception err) {
 			err.printStackTrace();
 		}
