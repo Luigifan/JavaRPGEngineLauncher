@@ -1,5 +1,10 @@
 package com.mikesantiago.launcher;
 
+import java.io.File;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.Scanner;
+
 import javax.swing.JOptionPane;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
@@ -10,7 +15,7 @@ import com.mikesantiago.launcher.OSDetection.OSType;
 public class MainProgram 
 {
 	private static String systemLookAndFeel = "";
-	private static OSType CurrentOS = OSDetection.GetCurrentOSName();
+	public static OSType CurrentOS = OSDetection.GetCurrentOSName();
 	
 	public static void main(String[] args)
 	{
@@ -24,10 +29,25 @@ public class MainProgram
 		System.out.println("end spy (again, not really)\n\n");
 		//launch the GUI
 		Launcher l = new Launcher();
-		l.pack();
 		l.setVisible(true);
+		//VersionTest();
 	}
 
+	private static void VersionTest()
+	{
+		try 
+		{
+			Downloader d = new Downloader(new URL("http://mrmiketheripper.x10.mx/rpg/update/latest.zip"));
+			d.setVisible(true);
+		} 
+		catch (MalformedURLException e) 
+		{
+			e.printStackTrace();
+		}
+		
+	}
+	
+	
 	public static void SetLookAndFeel()
 	{
 		switch(CurrentOS)
