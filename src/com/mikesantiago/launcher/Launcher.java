@@ -32,6 +32,7 @@ public class Launcher extends JFrame
 	
 	public Launcher()
 	{
+		setResizable(false);
 		setTitle("Java RPG Engine Launcher");
 		getContentPane().setLayout(null);
 		setSize(640, 390);
@@ -70,7 +71,7 @@ public class Launcher extends JFrame
 				RunGame();
 			}
 		});
-		btnLaunch.setBounds(459, 42, 163, 29);
+		btnLaunch.setBounds(459, 21, 163, 29);
 		panel.add(btnLaunch);
 		
 		latestVerLabel = new JLabel("LatestVer");

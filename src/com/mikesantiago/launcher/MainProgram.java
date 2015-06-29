@@ -19,6 +19,8 @@ public class MainProgram
 	
 	public static void main(String[] args)
 	{
+		SetLookAndFeel();
+		
 		System.out.println("spying on user (not really)");
 		if(CurrentOS == OSType.macosx)
 			System.out.println("game is running on " + OSDetection.GetCurrentOSName() + ", nice choice");
