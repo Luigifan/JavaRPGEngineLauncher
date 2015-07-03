@@ -35,11 +35,13 @@ public class Launcher extends JFrame
 	public static Version currentVersion = new Version(0,0,0,0);
 	JLabel curVerLabel;
 	JLabel latestVerLabel;
+	String errLogs = "No logs! Launch the game to make some!";
+	String infoLogs = "No logs! Launch the game to make some!";
 	
 	public Launcher()
 	{
 		setResizable(false);
-		setTitle("Java RPG Engine Launcher");
+		setTitle("Java RPG Engine Launcher v1.0.2.0");
 		getContentPane().setLayout(null);
 		setSize(640, 390);
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -69,6 +71,19 @@ public class Launcher extends JFrame
 		latestVerLabel = new JLabel("LatestVer");
 		latestVerLabel.setBounds(6, 42, 232, 16);
 		panel.add(latestVerLabel);
+		
+		JButton btnLogs = new JButton("Logs");
+		btnLogs.addActionListener(new ActionListener() 
+		{
+			public void actionPerformed(ActionEvent arg0) 
+			{
+				LogsViewer v = new LogsViewer(errLogs, infoLogs);
+				v.setAlwaysOnTop(true);
+				v.setVisible(true);
+			}
+		});
+		btnLogs.setBounds(404, 32, 55, 23);
+		panel.add(btnLogs);
 		
 		
 		JEditorPane editorPane = new JEditorPane();
@@ -102,7 +117,7 @@ public class Launcher extends JFrame
 		
 		JScrollPane scrollPane = new JScrollPane(editorPane);
 		scrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		scrollPane.setBounds(0, 0, 640, 289);
+		scrollPane.setBounds(0, 0, 633, 289);
 		getContentPane().add(scrollPane);
 		
 		SetIcons();
@@ -113,7 +128,7 @@ public class Launcher extends JFrame
 	
 	private void SetIcons()
 	{
-		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Minecraft Skin Stealer");
+		System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Java RPG Engine Launcher");
         String test = getClass().getResource("res/Icon.png").toString();
         this.setIconImage(Toolkit.getDefaultToolkit().getImage(getClass().getResource("res/Icon.png")));
 	}
@@ -150,14 +165,18 @@ public class Launcher extends JFrame
 			java.io.InputStream is = p.getInputStream();
 			byte b[] = new byte[is.available()];
 			is.read(b, 0, b.length);
+			infoLogs = new String(b);
 			
 			java.io.InputStream es = p.getErrorStream();
 			b = new byte[es.available()];
 			es.read(b, 0, b.length);
 			System.out.println(new String(b));
+			errLogs = new String(b);
 			this.setVisible(true);
 			this.requestFocus();
-		} catch (Exception err) {
+		} 
+		catch (Exception err) 
+		{
 			err.printStackTrace();
 		}
 	}
@@ -386,7 +405,7 @@ public class Launcher extends JFrame
 	
 	public void Update()
 	{
-		int result = JOptionPane.showConfirmDialog(this, "Do you wish to update from " + currentVersion.toString() + " to " + latestVersion.toString(),
+		int result = JOptionPane.showConfirmDialog(this, "Do you wish to update from " + currentVersion.toString() + " to " + latestVersion.toString() + "?",
 				"Update Confirmation", JOptionPane.YES_NO_OPTION);
 		if(result == JOptionPane.CLOSED_OPTION || result == JOptionPane.NO_OPTION)
 		{
